@@ -1,0 +1,44 @@
+{
+    "name": "mrrh/license-client",
+    "description": "Offline-first license activation and validation client for MRRH SaaS products, talking to the central License Server.",
+    "type": "library",
+    "license": "proprietary",
+    "keywords": ["laravel", "license", "licensing", "mrrh"],
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "illuminate/support": "^11.0|^12.0",
+        "illuminate/http": "^11.0|^12.0"
+    },
+    "suggest": {
+        "ext-sodium": "Required to verify Ed25519-signed license tokens, the License Server's default signing algorithm."
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0|^10.0",
+        "phpunit/phpunit": "^10.5|^11.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Mrrh\\LicenseClient\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Mrrh\\LicenseClient\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mrrh\\LicenseClient\\LicenseClientServiceProvider"
+            ],
+            "aliases": {
+                "License": "Mrrh\\LicenseClient\\Facades\\License"
+            }
+        }
+    },
+    "minimum-stability": "stable",
+    "config": {
+        "sort-packages": true
+    }
+}
