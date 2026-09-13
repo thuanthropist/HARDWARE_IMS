@@ -98,7 +98,7 @@ return [
     */
 
     'routes' => [
-        'blocked' => 'license-client.blocked',
+        'blocked' => 'license.blocked',
         'expired' => 'license.expired',
     ],
 

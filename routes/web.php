@@ -244,3 +244,8 @@ Route::middleware(['auth', 'permission:manage-license'])->group(function (): voi
 // with no way back in, even though license.index/activate above are already
 // reachable while expired.
 Route::middleware('auth')->get('/license/expired', fn () => view('license.expired'))->name('license.expired');
+
+// Same override, for the "not_activated"/"invalid" state (see
+// config/license-client.php's routes.blocked) — a fresh install with no
+// license yet hits this, not "expired".
+Route::middleware('auth')->get('/license/blocked', fn () => view('license.blocked'))->name('license.blocked');
