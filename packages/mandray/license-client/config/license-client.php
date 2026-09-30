@@ -130,4 +130,21 @@ return [
         'phone' => env('LICENSE_SUPPORT_PHONE'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Activation wizard
+    |--------------------------------------------------------------------------
+    |
+    | Backs the step-by-step activation-wizard Blade partial. Reveals server
+    | connectivity/config details and can trigger a real activation, so it's
+    | gated behind ['web', 'auth'] by default — set enabled to false to drop
+    | these routes entirely.
+    |
+    */
+
+    'wizard' => [
+        'enabled' => env('LICENSE_WIZARD_ENABLED', true),
+        'middleware' => ['web', 'auth'],
+    ],
+
 ];

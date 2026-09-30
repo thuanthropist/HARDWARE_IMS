@@ -10,6 +10,7 @@ use Mandray\LicenseClient\Console\Commands\HeartbeatLicense;
 use Mandray\LicenseClient\Http\Middleware\CheckLicense;
 use Mandray\LicenseClient\Http\Middleware\CheckLicenseFeature;
 use Mandray\LicenseClient\Services\ApiClient;
+use Mandray\LicenseClient\Services\LicenseActivationWizard;
 use Mandray\LicenseClient\Services\ServerFingerprint;
 use Mandray\LicenseClient\Services\TokenStore;
 use Mandray\LicenseClient\Services\TokenVerifier;
@@ -28,6 +29,7 @@ class LicenseClientServiceProvider extends ServiceProvider
         $this->app->singleton(ServerFingerprint::class);
         $this->app->singleton(ApiClient::class);
         $this->app->singleton(LicenseManager::class);
+        $this->app->singleton(LicenseActivationWizard::class);
     }
 
     public function boot(): void

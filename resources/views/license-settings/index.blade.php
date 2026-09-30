@@ -74,16 +74,10 @@
         </x-eva.card>
 
         <x-eva.card title="Activate License">
-            <form method="POST" action="{{ route('license.activate') }}" class="flex flex-col gap-4 sm:flex-row sm:items-end">
-                @csrf
-                <div class="flex-1">
-                    <x-eva.input name="license_key" label="License Key" required :value="$licenseKey" />
-                </div>
-                <x-eva.button type="submit">Activate</x-eva.button>
-            </form>
-            <p class="mt-3 text-xs text-slate-400">
+            <p class="mb-4 text-xs text-slate-400">
                 Activating replaces any currently stored license token. License server: {{ $serverUrl }}
             </p>
+            @include('license-client::activation-wizard')
         </x-eva.card>
     </div>
 </x-layouts.admin>
