@@ -26,7 +26,7 @@ use App\Services\SettingsManager;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
-use Mrrh\LicenseClient\LicenseManager;
+use Mandray\LicenseClient\LicenseManager;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 

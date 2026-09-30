@@ -7,8 +7,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use Mrrh\LicenseClient\Console\Commands\ActivateLicense;
-use Mrrh\LicenseClient\LicenseManager;
+use Mandray\LicenseClient\Console\Commands\ActivateLicense;
+use Mandray\LicenseClient\LicenseManager;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
 
