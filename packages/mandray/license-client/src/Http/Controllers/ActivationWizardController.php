@@ -19,19 +19,19 @@ class ActivationWizardController extends Controller
     {
     }
 
-    public function checkConfig(): JsonResponse
+    public function checkConfig(Request $request): JsonResponse
     {
-        return response()->json($this->wizard->checkConfig());
+        return response()->json($this->wizard->checkConfig($request->input('license_key')));
     }
 
-    public function checkCrypto(): JsonResponse
+    public function checkCrypto(Request $request): JsonResponse
     {
-        return response()->json($this->wizard->checkCrypto());
+        return response()->json($this->wizard->checkCrypto($request->input('license_key')));
     }
 
-    public function checkConnectivity(): JsonResponse
+    public function checkConnectivity(Request $request): JsonResponse
     {
-        return response()->json($this->wizard->checkConnectivity());
+        return response()->json($this->wizard->checkConnectivity($request->input('license_key')));
     }
 
     public function activate(Request $request, LicenseManager $manager): JsonResponse

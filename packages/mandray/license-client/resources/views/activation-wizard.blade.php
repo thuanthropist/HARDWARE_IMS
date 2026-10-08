@@ -153,7 +153,7 @@
             },
 
             async getJson(url) {
-                const res = await fetch(url, { headers: { Accept: 'application/json' } });
+                const res = await fetch(url + '?license_key=' + encodeURIComponent(this.licenseKey.trim()), { headers: { Accept: 'application/json' } });
                 return res.json();
             },
 
@@ -178,7 +178,7 @@
 
                 if (! await this.runStep('config', () => this.getJson(config.checkConfigUrl))) { this.running = false; return; }
                 if (! await this.runStep('crypto', () => this.getJson(config.checkCryptoUrl))) { this.running = false; return; }
-                if (! await this.runStep('connectivity', () => this.postJson(config.checkConnectivityUrl))) { this.running = false; return; }
+                if (! await this.runStep('connectivity', () => this.postJson(config.checkConnectivityUrl, { license_key: this.licenseKey.trim() }))) { this.running = false; return; }
 
                 const activateResult = await (async () => {
                     const step = this.steps.find(s => s.key === 'activate');

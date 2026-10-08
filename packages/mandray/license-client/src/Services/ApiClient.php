@@ -34,7 +34,24 @@ class ApiClient
         ]);
     }
 
-    protected function post(string $path, array $payload): ApiResult
+    /**
+     * Best-effort: tells the License Server how one local activation-wizard
+     * step went so the admin's Guided activation page can show it live.
+     * Short timeout, and the caller ignores the result — reporting must never
+     * be able to slow down or fail an activation.
+     */
+    public function reportProgress(string $licenseKey, string $domain, string $step, string $status, ?string $message): ApiResult
+    {
+        return $this->post('/api/v1/activation-progress', [
+            'license_key' => $licenseKey,
+            'domain' => $domain,
+            'step' => $step,
+            'status' => $status,
+            'message' => $message,
+        ], 4);
+    }
+
+    protected function post(string $path, array $payload, ?int $timeout = null): ApiResult
     {
         $baseUrl = rtrim((string) config('license-client.license_server_url'), '/');
         $apiKey = (string) config('license-client.api_key');
@@ -59,7 +76,7 @@ class ApiClient
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',
             ])
-                ->timeout((int) config('license-client.http_timeout', 10))
+                ->timeout($timeout ?? (int) config('license-client.http_timeout', 10))
                 ->send('POST', $baseUrl.$path, ['body' => $body]);
         } catch (ConnectionException $e) {
             return new ApiResult(false, 0, [], "Could not reach the License Server: {$e->getMessage()}");

@@ -26,7 +26,12 @@ class LicenseActivationWizard
      * Step 1: .env has the three credentials this install needs, and they
      * aren't stuck in a stale config cache.
      */
-    public function checkConfig(): array
+    public function checkConfig(?string $licenseKey = null): array
+    {
+        return $this->reported($licenseKey, 'config', $this->runConfigCheck());
+    }
+
+    private function runConfigCheck(): array
     {
         $missing = collect([
             'LICENSE_SERVER_URL' => config('license-client.license_server_url'),
@@ -53,7 +58,12 @@ class LicenseActivationWizard
      * have caught the "sodium not installed" failure mode up front instead
      * of after a confusing "signature did not verify" message.
      */
-    public function checkCrypto(): array
+    public function checkCrypto(?string $licenseKey = null): array
+    {
+        return $this->reported($licenseKey, 'crypto', $this->runCryptoCheck());
+    }
+
+    private function runCryptoCheck(): array
     {
         $hasSodium = function_exists('sodium_crypto_sign_verify_detached');
         $hasOpenssl = function_exists('openssl_verify');
@@ -80,7 +90,15 @@ class LicenseActivationWizard
      * Step 3: the License Server is actually reachable from here, before we
      * spend a real activation attempt finding that out.
      */
-    public function checkConnectivity(): array
+    public function checkConnectivity(?string $licenseKey = null): array
+    {
+        $result = $this->runConnectivityCheck();
+
+        // If the server couldn't be reached there's nobody to report to.
+        return $result['ok'] ? $this->reported($licenseKey, 'connectivity', $result) : $result;
+    }
+
+    private function runConnectivityCheck(): array
     {
         $url = rtrim((string) config('license-client.license_server_url'), '/');
 
@@ -110,7 +128,7 @@ class LicenseActivationWizard
      */
     public function activate(string $licenseKey): array
     {
-        $domain = request()->getHost() ?: (string) config('app.url');
+        $domain = $this->domain();
         $appVersion = (string) config('license-client.app_version', '1.0.0');
 
         $result = $this->api->activate($licenseKey, $domain, $this->fingerprint->generate(), $appVersion);
@@ -128,13 +146,14 @@ class LicenseActivationWizard
         $claims = $this->verifier->verify($token);
 
         if ($claims === null) {
-            return [
+            return $this->reported($licenseKey, 'verify', [
                 'ok' => false,
                 'message' => "Received a token but its signature did not verify against the configured public key. Double-check config/license-client.php's public_key matches this product on the License Server.",
-            ];
+            ]);
         }
 
         $this->store->write($token);
+        $this->reported($licenseKey, 'verify', ['ok' => true, 'message' => 'Token signature verified against the configured public key.']);
 
         return [
             'ok' => true,
@@ -142,5 +161,31 @@ class LicenseActivationWizard
             'expires_at' => $claims['expires_at'] ?? null,
             'features_enabled' => $claims['features_enabled'] ?? [],
         ];
+    }
+
+    private function domain(): string
+    {
+        return request()->getHost() ?: (string) config('app.url');
+    }
+
+    /**
+     * Reports a step's outcome to the License Server (best-effort) and hands
+     * the result back unchanged. No license key means nothing to attach it to.
+     */
+    private function reported(?string $licenseKey, string $step, array $result): array
+    {
+        if (blank($licenseKey)) {
+            return $result;
+        }
+
+        $status = ! $result['ok'] ? 'error' : (($result['warning'] ?? false) ? 'warn' : 'ok');
+
+        try {
+            $this->api->reportProgress($licenseKey, $this->domain(), $step, $status, $result['message'] ?? null);
+        } catch (Throwable) {
+            // Reporting is advisory only — never let it affect the step itself.
+        }
+
+        return $result;
     }
 }
